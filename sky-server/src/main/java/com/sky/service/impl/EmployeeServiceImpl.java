@@ -1,16 +1,20 @@
 package com.sky.service.impl;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
 import com.sky.constant.PasswordConstant;
 import com.sky.constant.StatusConstant;
 import com.sky.context.UserHolder;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
+import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
 import com.sky.exception.AccountLockedException;
 import com.sky.exception.AccountNotFoundException;
 import com.sky.exception.PasswordErrorException;
 import com.sky.mapper.EmployeeMapper;
+import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.EmployeeService;
 import org.springframework.beans.BeanUtils;
@@ -19,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
@@ -87,6 +92,26 @@ public class EmployeeServiceImpl implements EmployeeService {
         //添加
         employeeMapper.insert(employee);
         return Result.success("新增成功");
+    }
+
+    @Override
+    public Result<PageResult> getEmployees(EmployeePageQueryDTO employeePageQueryDTO) {
+        //判断DTO是否为空
+        if(employeePageQueryDTO == null){
+            return Result.error("不能为空");
+        }
+        //开始分页查询
+        PageHelper.startPage(employeePageQueryDTO.getPage(), employeePageQueryDTO.getPageSize());
+        Page<Employee> employeeByQuery = employeeMapper.getEmployeeByQuery(employeePageQueryDTO);
+        //封装对象
+        PageResult pageResult = new PageResult();
+        long total = employeeByQuery.getTotal();
+        // TODO:查询员工时应该返回vo，不用把员工的全部信息全部返回，比如密码身份证之类的
+        List<Employee> result = employeeByQuery.getResult();
+        pageResult.setTotal(total);
+        pageResult.setRecords(result);
+        //返回结果
+        return Result.success(pageResult);
     }
 
 }
