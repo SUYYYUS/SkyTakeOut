@@ -22,5 +22,17 @@ public interface EmployeeService {
      */
     Result addEmployee(EmployeeDTO employeeDTO);
 
+    /**
+     * 分页查询员工
+     * @param employeePageQueryDTO
+     * @return
+     */
     Result<PageResult> getEmployees(EmployeePageQueryDTO employeePageQueryDTO);
+
+    /**
+     * 禁用启用员工
+     * @param status
+     * @param id
+     */
+    void startOrStop(Integer status, long id);
 }

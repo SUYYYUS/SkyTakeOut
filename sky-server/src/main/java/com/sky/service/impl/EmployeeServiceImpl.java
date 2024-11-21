@@ -17,6 +17,7 @@ import com.sky.mapper.EmployeeMapper;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.EmployeeService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@Slf4j
 public class EmployeeServiceImpl implements EmployeeService {
 
     @Autowired
@@ -112,6 +114,21 @@ public class EmployeeServiceImpl implements EmployeeService {
         pageResult.setRecords(result);
         //返回结果
         return Result.success(pageResult);
+    }
+
+    /**
+     * 启动禁用员工
+     * @param status
+     * @param id
+     */
+    @Override
+    public void startOrStop(Integer status, long id) {
+        //创建一个实体对象
+        Employee employee = Employee.builder()
+                .id(id)
+                .status(status)
+                .build();
+            employeeMapper.updateEmployeeById(employee);
     }
 
 }
