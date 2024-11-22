@@ -85,12 +85,12 @@ public class EmployeeServiceImpl implements EmployeeService {
         //设置默认密码
         String password = DigestUtils.md5DigestAsHex(PasswordConstant.DEFAULT_PASSWORD.getBytes());
         employee.setPassword(password);
-        //设置创建时间
-        employee.setCreateTime(LocalDateTime.now());
-        employee.setUpdateTime(LocalDateTime.now());
-        //设置创建人
-        employee.setCreateUser(UserHolder.getCurrentId());
-        employee.setUpdateUser(UserHolder.getCurrentId());
+//        //设置创建时间
+//        employee.setCreateTime(LocalDateTime.now());
+//        employee.setUpdateTime(LocalDateTime.now());
+//        //设置创建人
+//        employee.setCreateUser(UserHolder.getCurrentId());
+//        employee.setUpdateUser(UserHolder.getCurrentId());
         //添加
         employeeMapper.insert(employee);
         return Result.success("新增成功");
@@ -108,7 +108,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         //封装对象
         PageResult pageResult = new PageResult();
         long total = employeeByQuery.getTotal();
-        // TODO:查询员工时应该返回vo，不用把员工的全部信息全部返回，比如密码身份证之类的
         List<Employee> result = employeeByQuery.getResult();
         pageResult.setTotal(total);
         pageResult.setRecords(result);
@@ -151,9 +150,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     public void updateEmployeeInfo(EmployeeDTO employeeDTO) {
         Employee employee = new Employee();
         BeanUtils.copyProperties(employeeDTO, employee);
-        //设置修改时间和修改人
-        employee.setUpdateUser(UserHolder.getCurrentId());
-        employee.setUpdateTime(LocalDateTime.now());
+//        //设置修改时间和修改人
+//        employee.setUpdateUser(UserHolder.getCurrentId());
+//        employee.setUpdateTime(LocalDateTime.now());
         //进行修改
         employeeMapper.updateEmployeeById(employee);
     }
