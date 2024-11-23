@@ -17,7 +17,6 @@ public interface SetmealMapper {
      * @param categoryId
      * @return
      */
-    @AutoFill(OperationType.INSERT)
     @Select("select count(id) from setmeal where category_id = #{categoryId}")
     Integer countByCategoryId(Long categoryId);
 
@@ -26,7 +25,8 @@ public interface SetmealMapper {
      * @param setmeal
      * @return
      */
-    Long insert(Setmeal setmeal);
+    @AutoFill(OperationType.INSERT)
+    void insert(Setmeal setmeal);
 
     /**
      * 分页查询套餐
@@ -34,5 +34,13 @@ public interface SetmealMapper {
      * @return
      */
     Page<SetmealVO> page(SetmealPageQueryDTO setmealPageQueryDTO);
+
+    /**
+     * 根据id查询
+     * @param id
+     * @return
+     */
+    @Select("select * from setmeal where id = #{id}")
+    Setmeal getById(Long id);
 
 }
