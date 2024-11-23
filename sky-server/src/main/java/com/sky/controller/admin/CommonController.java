@@ -15,6 +15,8 @@ public class CommonController {
     @PostMapping("/upload")
     @ApiOperation("文件上传")
     public Result uploadFile(){
+        // TODO 学习使用minio进行文件上传
+
         return Result.success();
     }
 
