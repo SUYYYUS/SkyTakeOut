@@ -122,4 +122,24 @@ public class SetmealServiceImpl implements SetmealService {
         setmealDishMapper.insert(setmealDishes);
         //完成
     }
+
+    /**
+     * 套餐的启售停售
+     * @param status
+     * @param id
+     */
+    @Override
+    public void startOrStop(int status, Long id) {
+        //判断id不会空
+        if(id == null){
+            throw new IdNullException(MessageConstant.ID_NULL);
+        }
+        //创建对象
+        Setmeal setmeal = new Setmeal();
+        setmeal.setId(id);
+        setmeal.setStatus(status);
+        //进行修改
+        setmealMapper.update(setmeal);
+        //完成
+    }
 }
