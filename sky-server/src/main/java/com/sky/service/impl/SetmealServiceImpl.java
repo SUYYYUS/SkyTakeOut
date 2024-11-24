@@ -7,6 +7,7 @@ import com.sky.dto.SetmealDTO;
 import com.sky.dto.SetmealPageQueryDTO;
 import com.sky.entity.Setmeal;
 import com.sky.entity.SetmealDish;
+import com.sky.exception.DeletionNotAllowedException;
 import com.sky.exception.IdNullException;
 import com.sky.mapper.CategoryMapper;
 import com.sky.mapper.SetmealDishMapper;
@@ -19,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -111,7 +113,7 @@ public class SetmealServiceImpl implements SetmealService {
         setmealMapper.update(setmeal);
         //2.修改套餐含有的菜品信息
         //先删除原来的信息
-        setmealDishMapper.deleteBySermealId(setmealDTO.getId());
+        setmealDishMapper.deleteBySetmealId(setmealDTO.getId());
         //再重新插入
         List<SetmealDish> setmealDishes = setmealDTO.getSetmealDishes();
         if (setmealDishes.size() > 0 && setmealDishes != null){
@@ -140,6 +142,27 @@ public class SetmealServiceImpl implements SetmealService {
         setmeal.setStatus(status);
         //进行修改
         setmealMapper.update(setmeal);
+        //完成
+    }
+
+    /**
+     * 批量删除套餐
+     * @param ids
+     */
+    @Override
+    @Transactional
+    public void deleteSetmeals(List<Long> ids) {
+        //先判断是否可以删除：通过查询有无状态为启售，为启售则不可以删除
+        int i = setmealMapper.status1(ids);
+        if (i > 0){
+            //说明有正在售卖的套餐，不能删除，抛出异常
+            throw new DeletionNotAllowedException(MessageConstant.SETMEAL_ON_SALE);
+        }else {
+            //1.在套餐表中删除
+            setmealMapper.deleteSetmeals(ids);
+            //2.在套餐菜品表中相关信息也要删除
+            setmealDishMapper.deleteBySetmealIds(ids);
+        }
         //完成
     }
 }

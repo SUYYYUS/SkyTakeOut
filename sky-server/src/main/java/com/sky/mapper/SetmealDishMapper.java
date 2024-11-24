@@ -22,5 +22,8 @@ public interface SetmealDishMapper {
 
     //根据套餐id删除信息
     @Delete("delete from setmeal_dish where setmeal_id = #{setmealId}")
-    void deleteBySermealId(Long setmealId);
+    void deleteBySetmealId(Long setmealId);
+
+    //根据套餐id批量删除
+    void deleteBySetmealIds(List<Long> ids);
 }

@@ -7,7 +7,10 @@ import com.sky.entity.Setmeal;
 import com.sky.enumeration.OperationType;
 import com.sky.vo.SetmealVO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
 
 @Mapper
 public interface SetmealMapper {
@@ -49,4 +52,17 @@ public interface SetmealMapper {
      */
     @AutoFill(OperationType.UPDATE)
     void update(Setmeal setmeal);
+
+    /**
+     * 查询为启售状态的套餐有多少
+     * @param ids
+     * @return
+     */
+    int status1(@Param("ids") List<Long> ids);
+
+    /**
+     * 批量删除套餐
+     * @param ids
+     */
+    void deleteSetmeals(List<Long> ids);
 }
