@@ -30,10 +30,18 @@ public interface EmployeeMapper {
             "(#{name}, #{username}, #{password}, #{phone}, #{sex}, #{idNumber}, #{status}, #{createTime}, #{updateTime}, #{createUser}, #{updateUser})")
     void insert(Employee employee);
 
+    /**
+     * 分页查询员工
+     * @param employeePageQueryDTO
+     * @return
+     */
     Page<Employee> getEmployeeByQuery(EmployeePageQueryDTO employeePageQueryDTO);
 
+    /**
+     * 修改员工信息
+     * @param employee
+     */
     @AutoFill(OperationType.UPDATE)
-    //修改员工信息
     void updateEmployeeById(Employee employee);
 
     /**

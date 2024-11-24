@@ -30,8 +30,18 @@ public interface DishMapper {
     @AutoFill(OperationType.INSERT)
     void addDish(Dish dish);
 
+    /**
+     * 分页查询菜品
+     * @param dishPageQueryDTO
+     * @return
+     */
     Page<DishVO> pageQuery(DishPageQueryDTO dishPageQueryDTO);
 
+    /**
+     * 通过id获取菜品信息
+     * @param id
+     * @return
+     */
     @Select("select * from dish where id = #{id}")
     Dish getById(Long id);
 
@@ -49,5 +59,10 @@ public interface DishMapper {
     @AutoFill(OperationType.UPDATE)
     void update(Dish dish);
 
+    /**
+     * 通过分类id获取菜品
+     * @param categoryId
+     * @return
+     */
     List<DishVO> getByCategoryId(Long categoryId);
 }

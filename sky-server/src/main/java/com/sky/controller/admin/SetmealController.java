@@ -60,6 +60,11 @@ public class SetmealController {
         return setmealService.getById(id);
     }
 
+    /**
+     * 修改套餐信息
+     * @param setmealDTO
+     * @return
+     */
     @PutMapping
     @ApiOperation("修改套餐信息")
     public Result update(@RequestBody SetmealDTO setmealDTO){

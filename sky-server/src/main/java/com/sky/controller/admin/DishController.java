@@ -24,7 +24,11 @@ public class DishController {
     @Autowired
     private DishService dishService;
 
-
+    /**
+     * 新增菜品
+     * @param dishDTO
+     * @return
+     */
     @PostMapping
     @ApiOperation("新增菜品")
     public Result addDish(@RequestBody DishDTO dishDTO){
@@ -85,6 +89,12 @@ public class DishController {
         return Result.success();
     }
 
+    /**
+     * 启售或停售菜品
+     * @param status
+     * @param id
+     * @return
+     */
     @PostMapping("/status/{status}")
     @ApiOperation("修改菜品出售状态")
     public Result startOrStop(@PathVariable int status, Long id){
@@ -93,6 +103,11 @@ public class DishController {
         return Result.success();
     }
 
+    /**
+     * 根据分类id查询其符合的菜品
+     * @param categoryId
+     * @return
+     */
     @GetMapping("/list")
     @ApiOperation("根据分类ID查询菜品")
     public Result getByCategoryId(Long categoryId){

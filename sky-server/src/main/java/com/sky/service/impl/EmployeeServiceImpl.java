@@ -35,7 +35,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     /**
      * 员工登录
-     *
      * @param employeeLoginDTO
      * @return
      */
@@ -43,16 +42,13 @@ public class EmployeeServiceImpl implements EmployeeService {
     public Employee login(EmployeeLoginDTO employeeLoginDTO) {
         String username = employeeLoginDTO.getUsername();
         String password = employeeLoginDTO.getPassword();
-
         //1、根据用户名查询数据库中的数据
         Employee employee = employeeMapper.getByUsername(username);
-
         //2、处理各种异常情况（用户名不存在、密码不对、账号被锁定）
         if (employee == null) {
             //账号不存在
             throw new AccountNotFoundException(MessageConstant.ACCOUNT_NOT_FOUND);
         }
-
         //密码比对
         //加密处理
         password = DigestUtils.md5DigestAsHex(password.getBytes());
@@ -65,7 +61,6 @@ public class EmployeeServiceImpl implements EmployeeService {
             //账号被锁定
             throw new AccountLockedException(MessageConstant.ACCOUNT_LOCKED);
         }
-
         //3、返回实体对象
         return employee;
     }
@@ -85,17 +80,16 @@ public class EmployeeServiceImpl implements EmployeeService {
         //设置默认密码
         String password = DigestUtils.md5DigestAsHex(PasswordConstant.DEFAULT_PASSWORD.getBytes());
         employee.setPassword(password);
-//        //设置创建时间
-//        employee.setCreateTime(LocalDateTime.now());
-//        employee.setUpdateTime(LocalDateTime.now());
-//        //设置创建人
-//        employee.setCreateUser(UserHolder.getCurrentId());
-//        employee.setUpdateUser(UserHolder.getCurrentId());
         //添加
         employeeMapper.insert(employee);
         return Result.success("新增成功");
     }
 
+    /**
+     * 分页查询员工
+     * @param employeePageQueryDTO
+     * @return
+     */
     @Override
     public Result<PageResult> getEmployees(EmployeePageQueryDTO employeePageQueryDTO) {
         //判断DTO是否为空
@@ -150,9 +144,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     public void updateEmployeeInfo(EmployeeDTO employeeDTO) {
         Employee employee = new Employee();
         BeanUtils.copyProperties(employeeDTO, employee);
-//        //设置修改时间和修改人
-//        employee.setUpdateUser(UserHolder.getCurrentId());
-//        employee.setUpdateTime(LocalDateTime.now());
         //进行修改
         employeeMapper.updateEmployeeById(employee);
     }

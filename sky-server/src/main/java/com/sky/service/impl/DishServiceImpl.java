@@ -35,15 +35,17 @@ public class DishServiceImpl implements DishService {
     @Autowired
     private SetmealDishMapper setmealDishMapper;
 
+    /**
+     * 新增菜品
+     * @param dishDTO
+     */
     @Override
     public void addDishWithFlavor(DishDTO dishDTO) {
-
         Dish dish = new Dish();
         BeanUtils.copyProperties(dishDTO, dish);
         //向菜品表插入一条数据
         dishMapper.addDish(dish);
         Long id = dish.getId();
-
         //向口味表插入多条数据
         List<DishFlavor> flavors = dishDTO.getFlavors();
         if(!flavors.isEmpty()){
@@ -52,7 +54,6 @@ public class DishServiceImpl implements DishService {
             });
         }
         dishFlavorMapper.insert(flavors);
-
     }
 
     /**

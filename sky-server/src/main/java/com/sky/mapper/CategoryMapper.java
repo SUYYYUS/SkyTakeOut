@@ -53,6 +53,11 @@ public interface CategoryMapper {
      */
     List<Category> list(Integer type);
 
+    /**
+     * 通过id查找种类的信息
+     * @param id
+     * @return
+     */
     @Select("select * from category where id = #{id}")
     Category getById(Long id);
 }
