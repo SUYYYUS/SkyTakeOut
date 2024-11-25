@@ -16,6 +16,9 @@ import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.SetmealService;
 import com.sky.vo.SetmealVO;
+import io.minio.BucketExistsArgs;
+import io.minio.MakeBucketArgs;
+import io.minio.MinioClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -165,4 +168,19 @@ public class SetmealServiceImpl implements SetmealService {
         }
         //完成
     }
+
+//
+//    @Autowired
+//    private MinioClient minioClient;
+//    public void test() throws Exception{
+//        System.out.println(minioClient);
+//
+//        String bucketName = "skytakeout";
+//        boolean b = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build());
+//        if(!b){
+//            minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
+//        }
+//
+//    }
+
 }
