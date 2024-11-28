@@ -36,11 +36,7 @@ public class CommonController {
     public Result uploadFile(@RequestParam("file") MultipartFile file) throws Exception {
         
         String fileName = file.getOriginalFilename();
-//        minioClient.uploadObject(UploadObjectArgs.builder().
-//                bucket("skytakeout")
-//                .object(fileName)
-//                .filename(fileName)
-//                .build());
+
         //存储文件
         minioClient.putObject(
                 PutObjectArgs.builder()
