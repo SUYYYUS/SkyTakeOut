@@ -30,6 +30,14 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     private SetmealMapper setmealMapper;
 
     /**
+     * 清空购物车
+     */
+    @Override
+    public void cleanCart() {
+        shoppingCartMapper.clean(UserHolder.getCurrentId());
+    }
+
+    /**
      * 新添加购物车
      * @param shoppingCartDTO
      */
@@ -65,5 +73,43 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
             shoppingCart.setCreateTime(LocalDateTime.now());
             shoppingCartMapper.insert(shoppingCart);
         }
+    }
+
+    /**
+     * 查看用户的购物车
+     * @return
+     */
+    @Override
+    public List<ShoppingCart> showCart() {
+        ShoppingCart build = ShoppingCart.builder().id(UserHolder.getCurrentId())
+                .build();
+        List<ShoppingCart> byUserIdAndId = shoppingCartMapper.getByUserIdAndId(build);
+        return byUserIdAndId;
+    }
+
+    /**
+     * 删除商品
+     * @param shoppingCartDTO
+     */
+    @Override
+    public void delete(ShoppingCartDTO shoppingCartDTO) {
+        //获取用户id
+        Long id = UserHolder.getCurrentId();
+        ShoppingCart shoppingCart = new ShoppingCart();
+        BeanUtils.copyProperties(shoppingCartDTO, shoppingCart);
+        shoppingCart.setUserId(id);
+        //先找到这条商品
+        List<ShoppingCart> byUserIdAndId = shoppingCartMapper.getByUserIdAndId(shoppingCart);
+        ShoppingCart cart = byUserIdAndId.get(0); //获取当前购物车
+        //判断扣一后是否还有这条商品
+        if(cart.getNumber() - 1 == 0){
+            //扣减后没了，则直接删除这条数据
+            shoppingCartMapper.deleteByUserIdAndId(shoppingCart);
+        }else {
+            //更改数量即可
+            cart.setNumber(cart.getNumber() - 1);
+            shoppingCartMapper.update(cart);
+        }
+        //完成
     }
 }
