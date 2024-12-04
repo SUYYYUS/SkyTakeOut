@@ -6,6 +6,13 @@
         insert into shopping_cart (name, image, user_id, setmeal_id, dish_id, dish_flavor, number, amount, create_time)
         values (#{name}, #{image}, #{userId}, #{setmealId}, #{dishId}, #{dishFlavor}, #{number}, #{amount}, #{createTime})
     </insert>
+    <insert id="insertBatch">
+        insert into shopping_cart (name, image, user_id, setmeal_id, dish_id, dish_flavor, number, amount, create_time)
+        values
+        <foreach collection="shoppingCartList" item="scl" separator=",">
+            (#{scl.name}, #{scl.image}, #{scl.userId}, #{scl.setmealId}, #{scl.dishId}, #{scl.dishFlavor}, #{scl.number}, #{scl.amount}, #{scl.createTime})
+        </foreach>
+    </insert>
 
     <delete id="deleteByUserIdAndId">
         delete from shopping_cart <where>
