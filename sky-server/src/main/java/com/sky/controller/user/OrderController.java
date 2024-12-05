@@ -33,7 +33,7 @@ public class OrderController {
     @ApiOperation("新增订单")
     @PostMapping("/submit")
     public Result<OrderSubmitVO> addOrder(@RequestBody OrdersSubmitDTO ordersSubmitDTO){
-        log.info("用户下蛋：{}", ordersSubmitDTO);
+        log.info("用户下单：{}", ordersSubmitDTO);
         OrderSubmitVO orderSubmitVO = orderService.addOrder(ordersSubmitDTO);
         return Result.success(orderSubmitVO);
     }
