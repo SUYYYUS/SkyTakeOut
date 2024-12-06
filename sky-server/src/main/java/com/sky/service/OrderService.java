@@ -43,4 +43,6 @@ public interface OrderService {
     void delivery(Long id);
 
     void complete(Integer id);
+
+    void reminder(Integer id);
 }
