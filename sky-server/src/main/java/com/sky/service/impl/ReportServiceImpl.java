@@ -4,6 +4,7 @@ import com.sky.entity.Orders;
 import com.sky.mapper.OrderMapper;
 import com.sky.mapper.UserMapper;
 import com.sky.service.ReportService;
+import com.sky.vo.OrderReportVO;
 import com.sky.vo.TurnoverReportVO;
 import com.sky.vo.UserReportVO;
 import jodd.util.StringUtil;
@@ -120,4 +121,69 @@ public class ReportServiceImpl implements ReportService {
         //返回结果
         return userReportVO;
     }
+
+    /**
+     * 订单数据统计
+     * @param begin
+     * @param end
+     * @return
+     */
+    @Override
+    public OrderReportVO getOrdersStatistics(LocalDate begin, LocalDate end) {
+        //先计算日期
+        List<LocalDate> dateTimeList = new ArrayList<>(); //用于存放日期范围内的每天日期
+        dateTimeList.add(begin);
+        while (!begin.equals(end)){
+            begin = begin.plusDays(1);
+            dateTimeList.add(begin);
+        }
+        String dateList = StringUtil.join(dateTimeList, ",");//拼接成字符串
+
+        List<Integer> ordersCount = new ArrayList<>(); //总订单每日数量
+        List<Integer> ordersCountPositive = new ArrayList<>(); //有效订单每日数量
+
+        for (LocalDate time : dateTimeList) {
+            //当天的开始时间和结束时间
+            LocalDateTime beginTime = LocalDateTime.of(time, LocalTime.MIN);
+            LocalDateTime endTime = LocalDateTime.of(time, LocalTime.MAX);
+
+            Map map = new HashMap();
+            map.put("begin", beginTime);
+            map.put("end", endTime);
+            //先查询当天总订单数
+            int ordersCount1 = orderMapper.getOrdersCount(map);
+            ordersCount.add(ordersCount1);
+            //再查询有效订单数
+            map.put("status", Orders.COMPLETED);
+            int ordersCount2 = orderMapper.getOrdersCount(map);
+            ordersCountPositive.add(ordersCount2);
+        }
+        //集合转为字符串
+        String join = StringUtils.join(ordersCount, ",");
+        String join1 = StringUtils.join(ordersCountPositive, ",");
+
+        int sum1, sum2 = 0;
+        sum1 = ordersCount.stream().mapToInt(oc -> oc).sum();
+        sum2 = ordersCountPositive.stream().mapToInt(oc -> oc).sum();
+        Double orderCompletionRate = 0.0;
+        if(sum1 != 0){
+            orderCompletionRate = ( (double) sum2 / (double) sum1 );
+        }
+
+
+        //封装对象
+        OrderReportVO orderReportVO = OrderReportVO.builder()
+                .orderCountList(join)
+                .validOrderCountList(join1)
+                .totalOrderCount(sum1)
+                .validOrderCount(sum2)
+                .dateList(dateList)
+                .orderCompletionRate(orderCompletionRate)
+                .build();
+
+        //返回对象
+        return orderReportVO;
+    }
+
+
 }
