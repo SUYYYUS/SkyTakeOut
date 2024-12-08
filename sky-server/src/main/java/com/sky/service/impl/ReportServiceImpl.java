@@ -40,12 +40,7 @@ public class ReportServiceImpl implements ReportService {
     public TurnoverReportVO getTurnoverStatistic(LocalDate begin, LocalDate end) {
         TurnoverReportVO turnoverReportVO = new TurnoverReportVO();
         //先计算日期
-        List<LocalDate> dateTimeList = new ArrayList<>(); //用于存放日期范围内的每天日期
-        dateTimeList.add(begin);
-        while (!begin.equals(end)){
-            begin = begin.plusDays(1);
-            dateTimeList.add(begin);
-        }
+        List<LocalDate> dateTimeList = getDateList(begin, end);
         String join = StringUtil.join(dateTimeList, ",");//拼接成字符串
         turnoverReportVO.setDateList(join);
 
@@ -83,12 +78,7 @@ public class ReportServiceImpl implements ReportService {
     public UserReportVO getUserStatistics(LocalDate begin, LocalDate end) {
 
         //先计算日期
-        List<LocalDate> dateTimeList = new ArrayList<>(); //用于存放日期范围内的每天日期
-        dateTimeList.add(begin);
-        while (!begin.equals(end)){
-            begin = begin.plusDays(1);
-            dateTimeList.add(begin);
-        }
+        List<LocalDate> dateTimeList = getDateList(begin, end);
         String dateList = StringUtil.join(dateTimeList, ",");//拼接成字符串
 
         //统计用户总量
@@ -131,12 +121,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public OrderReportVO getOrdersStatistics(LocalDate begin, LocalDate end) {
         //先计算日期
-        List<LocalDate> dateTimeList = new ArrayList<>(); //用于存放日期范围内的每天日期
-        dateTimeList.add(begin);
-        while (!begin.equals(end)){
-            begin = begin.plusDays(1);
-            dateTimeList.add(begin);
-        }
+        List<LocalDate> dateTimeList = getDateList(begin, end);
         String dateList = StringUtil.join(dateTimeList, ",");//拼接成字符串
 
         List<Integer> ordersCount = new ArrayList<>(); //总订单每日数量
@@ -183,6 +168,22 @@ public class ReportServiceImpl implements ReportService {
 
         //返回对象
         return orderReportVO;
+    }
+
+    /**
+     * 获取时间段的集合
+     * @param begin
+     * @param end
+     * @return
+     */
+    private List<LocalDate> getDateList(LocalDate begin, LocalDate end){
+        List<LocalDate> dateTimeList = new ArrayList<>(); //用于存放日期范围内的每天日期
+        dateTimeList.add(begin);
+        while (!begin.equals(end)){
+            begin = begin.plusDays(1);
+            dateTimeList.add(begin);
+        }
+        return dateTimeList;
     }
 
 
