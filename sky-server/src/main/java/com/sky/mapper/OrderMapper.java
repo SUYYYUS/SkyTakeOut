@@ -1,10 +1,12 @@
 package com.sky.mapper;
 
 import com.github.pagehelper.Page;
+import com.sky.dto.GoodsSalesDTO;
 import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.entity.Orders;
 import org.apache.ibatis.annotations.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -44,4 +46,6 @@ public interface OrderMapper {
 
 
     int getOrdersCount(Map map);
+
+    List<GoodsSalesDTO> getNameAndCount(LocalDateTime begin, LocalDateTime end);
 }

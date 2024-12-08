@@ -1,10 +1,12 @@
 package com.sky.service.impl;
 
+import com.sky.dto.GoodsSalesDTO;
 import com.sky.entity.Orders;
 import com.sky.mapper.OrderMapper;
 import com.sky.mapper.UserMapper;
 import com.sky.service.ReportService;
 import com.sky.vo.OrderReportVO;
+import com.sky.vo.SalesTop10ReportVO;
 import com.sky.vo.TurnoverReportVO;
 import com.sky.vo.UserReportVO;
 import jodd.util.StringUtil;
@@ -16,10 +18,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -168,6 +168,37 @@ public class ReportServiceImpl implements ReportService {
 
         //返回对象
         return orderReportVO;
+    }
+
+    /**
+     * 获取销量前10
+     * @param begin
+     * @param end
+     * @return
+     */
+    @Override
+    public SalesTop10ReportVO getTop10(LocalDate begin, LocalDate end) {
+        LocalDateTime beginTime = LocalDateTime.of(begin, LocalTime.MIN);
+        LocalDateTime endTime = LocalDateTime.of(end, LocalTime.MAX);
+
+        List<GoodsSalesDTO> nameAndCount = orderMapper.getNameAndCount(beginTime, endTime);
+        if(nameAndCount.size() == 0){
+            return null;
+        }
+
+        //取出每一个菜品名字
+        List<String> nameList = nameAndCount.stream().map(GoodsSalesDTO::getName).collect(Collectors.toList());
+        //取出每一个菜品的数量
+        List<Integer> countList = nameAndCount.stream().map(GoodsSalesDTO::getNumber).collect(Collectors.toList());
+        //转化字符串
+        String nameList2String = StringUtils.join(nameList, ",");
+        String countList2String = StringUtils.join(countList, ",");
+
+        //封装对象返回
+        return SalesTop10ReportVO.builder()
+                .numberList(countList2String)
+                .nameList(nameList2String)
+                .build();
     }
 
     /**
