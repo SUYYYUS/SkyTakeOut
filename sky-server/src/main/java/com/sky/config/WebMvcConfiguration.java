@@ -1,5 +1,7 @@
 package com.sky.config;
 
+import com.sky.interceptor.CheckIdempotentAddOrderInterceptor;
+import com.sky.interceptor.CheckIdempotentPayOrderInterceptor;
 import com.sky.interceptor.JwtTokenAdminInterceptor;
 import com.sky.interceptor.JwtTokenUserInterceptor;
 import com.sky.json.JacksonObjectMapper;
@@ -32,6 +34,10 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
     private JwtTokenAdminInterceptor jwtTokenAdminInterceptor;
     @Autowired
     private JwtTokenUserInterceptor jwtTokenUserInterceptor;
+    @Autowired
+    private CheckIdempotentPayOrderInterceptor checkIdempotentPayOrderInterceptor;
+    @Autowired
+    private CheckIdempotentAddOrderInterceptor checkIdempotentAddOrderInterceptor;
 
     /**
      * 注册自定义拦截器
@@ -45,10 +51,18 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
                 .addPathPatterns("/admin/**")
                 .excludePathPatterns("/admin/employee/login");
 
+
         registry.addInterceptor(jwtTokenUserInterceptor)
                 .addPathPatterns("/user/**")
                 .excludePathPatterns("/user/user/login")
-                .excludePathPatterns("/user/shop/status");
+                .excludePathPatterns("/user/shop/status")
+                .excludePathPatterns("/user/order/getToken")
+                .excludePathPatterns("/user/order/saveOrder");
+
+        registry.addInterceptor(checkIdempotentPayOrderInterceptor)
+                .addPathPatterns("/user/**");
+        registry.addInterceptor(checkIdempotentAddOrderInterceptor)
+                .addPathPatterns("/user/order/**");
     }
 
     /**

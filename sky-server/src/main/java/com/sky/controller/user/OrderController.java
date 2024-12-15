@@ -1,6 +1,8 @@
 package com.sky.controller.user;
 
-import com.sky.dto.OrdersPageQueryDTO;
+import com.sky.annotation.CheckIdempotentAddOrder;
+import com.sky.annotation.CheckIdempotentPayOrder;
+import com.sky.constant.CheckIdempotentConstant;
 import com.sky.dto.OrdersPaymentDTO;
 import com.sky.dto.OrdersSubmitDTO;
 import com.sky.result.PageResult;
@@ -13,7 +15,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @RestController("userOrderController")
 @RequestMapping("/user/order")
@@ -23,6 +29,8 @@ public class OrderController {
 
     @Autowired
     private OrderService orderService;
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
 
 
     /**
@@ -108,6 +116,42 @@ public class OrderController {
         log.info("用户催单：{}", id);
         orderService.reminder(id);
         return Result.success();
+    }
+
+    /**
+     * 用于支付订单测试幂等性校验
+     * @return
+     */
+    @GetMapping("/payOrder")
+    @ApiOperation("用于支付订单测试幂等性校验")
+    @CheckIdempotentPayOrder //注解
+    public Result payOrder(){
+        log.info("测试用户支付订单单");
+        return Result.success("一次支付订单");
+    }
+
+    /**
+     * 用于支付订单测试幂等性校验
+     */
+    @GetMapping("/getPayOrderToken")
+    @ApiOperation("用于支付订单测试幂等性校验")
+    public Result getPayOrderToken(){
+        String string = UUID.randomUUID().toString(); //创建一个token
+        String key = CheckIdempotentConstant.PAY_ORDER_TOKEN_REDIS + string;
+        stringRedisTemplate.opsForValue().set(key, string, 15, TimeUnit.MINUTES);
+        return Result.success(string);
+    }
+
+    /**
+     * 用于提交订单测试幂等性校验
+     * @return
+     */
+    @GetMapping("/addOrder")
+    @ApiOperation("用于提交订单测试幂等性校验")
+    @CheckIdempotentAddOrder //注解
+    public Result addOrder(){
+        log.info("测试用户提交订单");
+        return Result.success("一次提交订单");
     }
 
 }
