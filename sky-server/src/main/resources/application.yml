@@ -57,3 +57,7 @@ sky:
   wechat:
     appid: ${sky.wechat.appid}
     secret: ${sky.wechat.secret}
+  shop:
+    address: 广东省广州市番禺区小谷围岛广东工业大学
+  baidu:
+    ak: hAiDXWDiRWLTwserHADbIcyPAa5g0NFg
