@@ -61,3 +61,23 @@ sky:
     address: 广东省广州市番禺区小谷围岛广东工业大学
   baidu:
     ak: hAiDXWDiRWLTwserHADbIcyPAa5g0NFg
+
+
+bloomFilter:
+  # 是否启动布隆
+  bloomFilterFlag: true
+  # 初始大小
+  MIN_EXPECTED_INSERTIONS: 8
+  # 它的错误率
+  bloomFilterErrorRate: 0.01
+  # 最大使用率
+  maximumUtilization: 0.90
+  # 最小使用率
+  minimumUtilization: 0.40
+  # 初始序列号
+  RBloomFilterSequence: 1
+
+
+springfox:
+  documentation:
+    enabled: false
