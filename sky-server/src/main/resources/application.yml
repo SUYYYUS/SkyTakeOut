@@ -67,9 +67,9 @@ bloomFilter:
   # 是否启动布隆
   bloomFilterFlag: true
   # 初始大小
-  MIN_EXPECTED_INSERTIONS: 8
+  MIN_EXPECTED_INSERTIONS: 10
   # 它的错误率
-  bloomFilterErrorRate: 0.01
+  bloomFilterErrorRate: 0.001
   # 最大使用率
   maximumUtilization: 0.90
   # 最小使用率

@@ -10,13 +10,13 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
+/**
+ * 用于测试布隆过滤器
+ */
 @Slf4j
 @RestController
 @RequestMapping("/bloom")
 public class BloomFilterController {
-
-    @Resource
-    private BloomFilterService bloomFilterService;
 
     @Resource
     private RBloomFilterService rBloomFilterService;
@@ -24,15 +24,16 @@ public class BloomFilterController {
     @Resource
     private BloomFilterUtil bloomFilterConfig;
 
-    @GetMapping("/add")
-    public void add(@RequestParam String element){
+/*    @Resource
+    private BloomFilterService bloomFilterService;
+    @GetMapping("/add/{element}")
+    public void add(@PathVariable("element") String element){
         bloomFilterService.add(element);
     }
-
-    @GetMapping("/check")
-    public String check(@RequestParam String element){
+    @GetMapping("/check/{element}")
+    public String check(@PathVariable("element") String element){
         return bloomFilterService.check(element);
-    }
+    }*/
 
     @GetMapping("/addR/{element}")
     public void addR(@PathVariable("element") String element){

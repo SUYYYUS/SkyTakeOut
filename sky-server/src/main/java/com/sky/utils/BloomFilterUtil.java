@@ -16,6 +16,9 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * 布隆过滤器工具类
+ */
 @Component
 @Slf4j
 public class BloomFilterUtil {
@@ -46,7 +49,7 @@ public class BloomFilterUtil {
     //布隆过滤器的容量自适应定时任务频率
     private static final String CRON_EXPANSION = "0 0/5 * * * ?";
 
-    public BloomFilter<String> bloomFilter;
+//    public BloomFilter<String> bloomFilter;
 
     public RBloomFilter<String> rBloomFilter;
 
@@ -56,7 +59,7 @@ public class BloomFilterUtil {
     /**
      * 初始化基于JVM本地缓存构建布隆过滤器
      */
-    @PostConstruct
+/*    @PostConstruct
     public void buildBloomFilter(){
         EXPECTED_INSERTIONS = MIN_EXPECTED_INSERTIONS;
         //创建并返回BloomFilter对象
@@ -64,13 +67,14 @@ public class BloomFilterUtil {
                 Funnels.stringFunnel(Charset.forName("UTF-8")),
                 EXPECTED_INSERTIONS,
                 FPP);
-    }
+    }*/
 
     /**
      * 初始化基于redis防止数据库查询的布隆过滤器
      */
     @PostConstruct
     public void buildUserRegisterCachePenetrationBloomFilter(){
+        //初始化大小
         EXPECTED_INSERTIONS = MIN_EXPECTED_INSERTIONS;
         RBloomFilter<String> cachePenetrationBloomFilter = getRBloomFilter();
         cachePenetrationBloomFilter.tryInit(EXPECTED_INSERTIONS, FPP);
@@ -85,7 +89,7 @@ public class BloomFilterUtil {
      * @param cachePenetrationBloomFilter
      */
     private void initRBloomFilter(RBloomFilter<String> cachePenetrationBloomFilter) {
-        List<String> names = Arrays.asList("7", "6", "5", "4", "3", "2", "1");
+        List<String> names = Arrays.asList("0");
         names.parallelStream().forEach(cachePenetrationBloomFilter::add);
     }
 
@@ -94,7 +98,6 @@ public class BloomFilterUtil {
      * @return
      */
     private RBloomFilter<String> getRBloomFilter() {
-
         try {
             RBloomFilter<String> bloomFilter;
             //布隆过滤器序号判断
