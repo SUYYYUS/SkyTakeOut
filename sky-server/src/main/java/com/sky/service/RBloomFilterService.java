@@ -33,12 +33,12 @@ public class RBloomFilterService {
      * @param element
      * @return
      */
-    public String check(String element){
+    public boolean check(String element){
         log.info("序号：{}", bloomFilterUtil.RBloomFilterSequence);
         log.info("元素个数：{}", bloomFilterUtil.rBloomFilter.count());
         log.info("期望插入数：{}", bloomFilterUtil.rBloomFilter.getExpectedInsertions());
         log.info("假阳性概率：{}", bloomFilterUtil.rBloomFilter.getFalseProbability());
-        return bloomFilterUtil.rBloomFilter.contains(element) ? "存在" : "不存在";
+        return bloomFilterUtil.rBloomFilter.contains(element);
 
     }
 

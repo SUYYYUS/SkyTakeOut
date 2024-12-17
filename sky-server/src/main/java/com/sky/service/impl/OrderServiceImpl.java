@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
+import com.sky.constant.RedisConstant;
 import com.sky.context.UserHolder;
 import com.sky.dto.*;
 import com.sky.entity.*;
@@ -15,6 +16,8 @@ import com.sky.exception.ShoppingCartBusinessException;
 import com.sky.mapper.*;
 import com.sky.result.PageResult;
 import com.sky.service.OrderService;
+import com.sky.service.RBloomFilterService;
+import com.sky.utils.BloomFilterUtil;
 import com.sky.utils.HttpClientUtil;
 import com.sky.utils.WeChatPayUtil;
 import com.sky.vo.OrderPaymentVO;
@@ -26,6 +29,7 @@ import org.bouncycastle.crypto.agreement.jpake.JPAKEPrimeOrderGroup;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,6 +57,10 @@ public class OrderServiceImpl implements OrderService {
     private WeChatPayUtil weChatPayUtil;
     @Autowired
     private WebSocketServer webSocketServer;
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+    @Autowired
+    private RBloomFilterService rBloomFilterService;
 
     @Value("${sky.shop.address}")
     private String shopAddress;
@@ -94,7 +102,20 @@ public class OrderServiceImpl implements OrderService {
         orders.setPhone(addressBook.getPhone());
         orders.setConsignee(addressBook.getConsignee());
         orders.setUserId(UserHolder.getCurrentId());
-        orderMapper.insert(orders);
+        orderMapper.insert(orders); //插入数据库
+
+        // 添加缓存到Redis中
+        String key = RedisConstant.CACHE_ORDER + orders.getId();
+        String value = JSON.toJSONString(orders);
+        Boolean b = stringRedisTemplate.opsForValue().setIfAbsent(key, value);
+        if (!b){
+            throw new IllegalStateException("Something wrong");
+        }
+
+        // 添加订单id到布隆过滤器中
+        rBloomFilterService.add(String.valueOf(orders.getId()));
+
+
         //插入n条订单详细数据
         List<OrderDetail> orderDetailList = new ArrayList<>();
         //遍历购物车
@@ -219,11 +240,30 @@ public class OrderServiceImpl implements OrderService {
      */
     @Override
     public OrderVO getOrderdetails(Integer id) {
-        Orders byId = orderMapper.getById(id);
+        Orders orders = new Orders();
+        //TODO 1.先通过布隆过滤器查询
+        boolean check = rBloomFilterService.check(String.valueOf(id));
+        if(!check){
+            return null; //布隆过滤器找不到，说明还没有这个订单
+        }
+        //TODO 2.如果存在则进入缓存查询
+        String s = stringRedisTemplate.opsForValue().get(RedisConstant.CACHE_ORDER + id);
+        if(s == null){
+            //TODO 3.缓存没有查询数据库，数据库存在，先存放入缓存中，再返回
+            orders = orderMapper.getById(id);
+            if(orders == null){
+                //TODO 4.若数据库不存在，返回null，缓存中提示没有该东西
+                return null;
+            }else {
+                String value = JSON.toJSONString(orders);
+                stringRedisTemplate.opsForValue().setIfAbsent(RedisConstant.CACHE_ORDER + id, value);
+            }
+        }
+        //查询详细信息
         List<OrderDetail> byOrderId = orderDetailMapper.getByOrderId(Long.valueOf(id));
         OrderVO orderVO = new OrderVO();
         orderVO.setOrderDetailList(byOrderId);
-        BeanUtils.copyProperties(byId, orderVO);
+        BeanUtils.copyProperties(orders, orderVO);
         //返回结果
         return orderVO;
     }

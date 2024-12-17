@@ -2,9 +2,12 @@ package com.sky.controller;
 
 import com.sky.result.Result;
 import com.sky.service.BloomFilterService;
+import com.sky.service.OrderService;
 import com.sky.service.RBloomFilterService;
 import com.sky.utils.BloomFilterUtil;
+import com.sky.vo.OrderVO;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -24,6 +27,9 @@ public class BloomFilterController {
     @Resource
     private BloomFilterUtil bloomFilterConfig;
 
+    @Autowired
+    private OrderService orderService;
+
 /*    @Resource
     private BloomFilterService bloomFilterService;
     @GetMapping("/add/{element}")
@@ -42,13 +48,20 @@ public class BloomFilterController {
 
     @GetMapping("/checkR/{element}")
     public Result checkR(@PathVariable("element") String element){
-        String check = rBloomFilterService.check(element);
+        boolean check = rBloomFilterService.check(element);
         return Result.success(check);
     }
 
     @GetMapping("/dilatationR")
     public void dilatationR(){
         bloomFilterConfig.dilatation();
+    }
+
+    @GetMapping("/getOrder/{id}")
+    public Result getOrder(@PathVariable("id") Integer id){
+        log.info("根据id查订单" + id);
+        OrderVO orderdetails = orderService.getOrderdetails(id);
+        return Result.success(orderdetails);
     }
 }
 
