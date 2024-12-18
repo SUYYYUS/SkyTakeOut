@@ -1,5 +1,6 @@
 package com.sky.controller.admin;
 
+import com.sky.entity.Orders;
 import com.sky.result.Result;
 import com.sky.service.WorkspaceService;
 import com.sky.vo.BusinessDataVO;
@@ -11,10 +12,12 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 /**
  * 工作台
@@ -73,4 +76,21 @@ public class WorkSpaceController {
     public Result<SetmealOverViewVO> setmealOverView(){
         return Result.success(workspaceService.getSetmealOverView());
     }
+
+    @GetMapping("/exceptionOrders")
+    public Result exceptionOrders(){
+        log.info("查询异常订单");
+        List<Orders> orders = workspaceService.getExceptionOrders();
+        return Result.success(orders);
+    }
+
+    /**
+     * 模拟处理了一个派送中的订单，然后把订单从redis中删除
+     */
+    @GetMapping("/handlerOrder/{id}")
+    public Result handlerOrder(@PathVariable("id") Long id){
+        workspaceService.handlerOrder(id);
+        return Result.success();
+    }
+
 }

@@ -13,7 +13,7 @@ public class RedisConfig {
         //配置类
         Config config = new Config();
         //添加redis地址，这里添加的是单节点，还没有做集群
-        config.useSingleServer().setAddress("redis://192.168.223.141:6379").setPassword("123456").setDatabase(2);
+        config.useSingleServer().setAddress("redis://192.168.223.142:6379").setPassword("123456").setDatabase(2);
         return Redisson.create(config);
     }
 

@@ -1,5 +1,6 @@
 package com.sky.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.sky.constant.StatusConstant;
 import com.sky.entity.Orders;
 import com.sky.mapper.DishMapper;
@@ -13,10 +14,13 @@ import com.sky.vo.OrderOverViewVO;
 import com.sky.vo.SetmealOverViewVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -31,6 +35,8 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     private DishMapper dishMapper;
     @Autowired
     private SetmealMapper setmealMapper;
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
 
     /**
      * 根据时间段统计营业数据
@@ -159,5 +165,33 @@ public class WorkspaceServiceImpl implements WorkspaceService {
                 .sold(sold)
                 .discontinued(discontinued)
                 .build();
+    }
+
+    @Override
+    public List<Orders> getExceptionOrders() {
+        //查询list的所有值
+        List<String> list = stringRedisTemplate.opsForList().range("exception:order", 0, -1);
+        System.out.println(list.size());
+        List<Orders> orders = new ArrayList<>();
+        for (String s : list) {
+            Orders order = JSON.parseObject(s, Orders.class);
+            orders.add(order);
+        }
+        return orders;
+    }
+
+    /**
+     * 模拟处理完一个派送中的订单
+     * @param id
+     */
+    @Override
+    public void handlerOrder(Long id) {
+        //在数据库中修改状态
+        log.info("在数据库中修改状态");
+        // redis中删除
+        Orders orders = orderMapper.getById(Math.toIntExact(id));
+        Long remove = stringRedisTemplate.opsForList().remove("exception:order", 0, JSON.toJSONString(orders));
+        log.info("修改成功删除成功", + remove);
+
     }
 }

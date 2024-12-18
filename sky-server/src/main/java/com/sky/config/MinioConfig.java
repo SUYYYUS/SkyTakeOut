@@ -10,7 +10,7 @@ public class MinioConfig {
 
     @Bean
     public MinioClient minioClient(){
-        return MinioClient.builder().endpoint("http://192.168.223.141:9000")
+        return MinioClient.builder().endpoint("http://192.168.223.142:9000")
                 .credentials("minioadmin", "minioadmin")
                 .build();
     }

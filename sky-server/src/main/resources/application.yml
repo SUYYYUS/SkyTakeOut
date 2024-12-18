@@ -13,7 +13,7 @@ spring:
       username: ${sky.datasource.username}
       password: ${sky.datasource.password}
   redis:
-    host: 192.168.223.141
+    host: 192.168.223.142
     port: 6379
     password: 123456
     lettuce:
@@ -23,6 +23,15 @@ spring:
         min-idle: 1
         time-between-eviction-runs: 10s
     database: 2
+  rabbitmq:
+    host: 192.168.223.142
+    port: 5672
+    virtual-host: /takeout
+    username: takeout
+    password: 123
+    listener:
+      direct:
+        prefetch: 1 # 消费完一条信息才可以继续消费
 
 mybatis:
   #mapper配置文件

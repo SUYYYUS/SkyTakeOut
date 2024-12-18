@@ -1,10 +1,12 @@
 package com.sky.service;
 
+import com.sky.entity.Orders;
 import com.sky.vo.BusinessDataVO;
 import com.sky.vo.DishOverViewVO;
 import com.sky.vo.OrderOverViewVO;
 import com.sky.vo.SetmealOverViewVO;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public interface WorkspaceService {
 
@@ -34,4 +36,12 @@ public interface WorkspaceService {
      */
     SetmealOverViewVO getSetmealOverView();
 
+    /**
+     * 查询异常订单
+     *
+     * @return
+     */
+    List<Orders> getExceptionOrders();
+
+    void handlerOrder(Long id);
 }
