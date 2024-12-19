@@ -1,6 +1,7 @@
 package com.sky.service;
 
 import com.sky.dto.*;
+import com.sky.entity.Orders;
 import com.sky.result.PageResult;
 import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderStatisticsVO;
@@ -28,6 +29,8 @@ public interface OrderService {
 
     void cancelOrder(Long id);
 
+    void cancelOrderBySystem(Long id);
+
     void oneMore(Long id);
 
     PageResult getOrders(OrdersPageQueryDTO ordersPageQueryDTO);
@@ -45,4 +48,6 @@ public interface OrderService {
     void complete(Integer id);
 
     void reminder(Integer id);
+
+    Orders getById(Long id);
 }

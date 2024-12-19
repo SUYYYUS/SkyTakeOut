@@ -23,15 +23,39 @@ spring:
         min-idle: 1
         time-between-eviction-runs: 10s
     database: 2
+
+
   rabbitmq:
     host: 192.168.223.142
     port: 5672
     virtual-host: /takeout
     username: takeout
     password: 123
+
     listener:
       direct:
         prefetch: 1 # 消费完一条信息才可以继续消费
+        acknowledge-mode: auto # 消息接收确认机制
+        # 消费者失败消息重试
+        retry:
+          enabled: true # 开启
+          initial-interval: 1000ms
+          max-attempts: 3 # 最大重试次数
+
+    connection-timeout: 200ms # 连接超时时间
+
+    # 生产者重连
+    template:
+      retry:
+        enabled: true
+        multiplier: 1 #连接失败的重试
+        initial-interval: 1000ms
+        max-attempts: 3 #最大重试次数
+
+    # 生产者确认机制，一般是要关闭的
+    publisher-confirm-type: none
+    publisher-returns: false
+
 
 mybatis:
   #mapper配置文件

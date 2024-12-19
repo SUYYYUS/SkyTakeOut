@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
+import com.sky.constant.MqConstants;
 import com.sky.constant.RedisConstant;
 import com.sky.context.UserHolder;
 import com.sky.dto.*;
@@ -14,10 +15,12 @@ import com.sky.exception.AddressBookBusinessException;
 import com.sky.exception.OrderBusinessException;
 import com.sky.exception.ShoppingCartBusinessException;
 import com.sky.mapper.*;
+import com.sky.result.MultiDelayMessage;
 import com.sky.result.PageResult;
 import com.sky.service.OrderService;
 import com.sky.service.RBloomFilterService;
 import com.sky.utils.BloomFilterUtil;
+import com.sky.utils.DelayMessageProcessor;
 import com.sky.utils.HttpClientUtil;
 import com.sky.utils.WeChatPayUtil;
 import com.sky.vo.OrderPaymentVO;
@@ -26,6 +29,10 @@ import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
 import com.sky.websocket.WebSocketServer;
 import org.bouncycastle.crypto.agreement.jpake.JPAKEPrimeOrderGroup;
+import org.springframework.amqp.AmqpException;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessagePostProcessor;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -61,6 +68,8 @@ public class OrderServiceImpl implements OrderService {
     private StringRedisTemplate stringRedisTemplate;
     @Autowired
     private RBloomFilterService rBloomFilterService;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     @Value("${sky.shop.address}")
     private String shopAddress;
@@ -144,6 +153,17 @@ public class OrderServiceImpl implements OrderService {
         map.put("content", "订单号" + orders.getNumber());
         String jsonString = JSON.toJSONString(map);
         webSocketServer.sendToAllClient(jsonString);
+
+        //发送到mq中延迟判断其是否已经支付
+        try {
+            MultiDelayMessage<Long> msg = MultiDelayMessage.of(orders.getId(), new Long[]{10000L, 10000L, 10000L, 30000L});
+            rabbitTemplate.convertAndSend(MqConstants.ORDER_DELAY_EXCHANGE,
+                    MqConstants.ORDER_DELAY_ROUTING_KEY,
+                    msg,
+                    new DelayMessageProcessor(msg.removeNextDelay().intValue()));
+        } catch (AmqpException e) {
+            System.out.println("延迟消息记录异常");
+        }
 
         return orderSubmitVO;
     }
@@ -286,6 +306,27 @@ public class OrderServiceImpl implements OrderService {
         orders1.setCancelTime(LocalDateTime.now());
         orderMapper.update(orders1);
     }
+
+
+    /**
+     * 系统应超时自动取消订单
+     * @param id
+     */
+    @Override
+    public void cancelOrderBySystem(Long id) {
+        //先根据id查询该订单信息
+        Orders orders = orderMapper.getById(Math.toIntExact(id));
+        if(orders == null){
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
+        Orders orders1 = new Orders();
+        orders1.setId(orders.getId());
+        orders1.setStatus(Orders.CANCELLED);
+        orders1.setRejectionReason("超时未支付系统自动取消");
+        orders1.setCancelTime(LocalDateTime.now());
+        orderMapper.update(orders1);
+    }
+
 
     /**
      * 再来一单
@@ -473,6 +514,12 @@ public class OrderServiceImpl implements OrderService {
         String jsonString = JSON.toJSONString(map);
         webSocketServer.sendToAllClient(jsonString);
         //完成
+    }
+
+    @Override
+    public Orders getById(Long id) {
+        Orders orders = orderMapper.getById(Math.toIntExact(id));
+        return orders;
     }
 
     /**
