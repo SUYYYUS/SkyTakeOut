@@ -29,7 +29,7 @@ public class OrderTask {
     /**
      * 处理未支付超时订单
      */
-    @Scheduled(cron = "* 0/1 * * * ? ") //每分钟触发一次
+    @Scheduled(cron = "0 * * * * ? ") //每分钟触发一次
     public void processOvertimeOrders(){
         log.info("定时处理超时订单：{}", LocalDateTime.now());
 
@@ -51,7 +51,7 @@ public class OrderTask {
     /**
      * 处理一直处于派送中的订单
      */
-    @Scheduled(cron = "* * 0/1 * * ?")
+    @Scheduled(cron = "0 0 0/1 * * ?")
     public void processDeliveryOrders(){
         log.info("处理一直处于派送中的订单：{}", LocalDateTime.now());
         LocalDateTime time = LocalDateTime.now().plusHours(-1);
