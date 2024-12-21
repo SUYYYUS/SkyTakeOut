@@ -48,4 +48,7 @@ public interface OrderMapper {
     int getOrdersCount(Map map);
 
     List<GoodsSalesDTO> getNameAndCount(LocalDateTime begin, LocalDateTime end);
+
+    @Select("select * from orders ")
+    List<Orders> getAllOrders();
 }

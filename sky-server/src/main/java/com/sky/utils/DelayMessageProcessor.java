@@ -5,6 +5,9 @@ import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessagePostProcessor;
 
+/**
+ * 负责设置延迟时间的处理器
+ */
 @AllArgsConstructor
 public class DelayMessageProcessor implements MessagePostProcessor {
 
